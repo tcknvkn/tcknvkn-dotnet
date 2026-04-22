@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.1;netstandard2.0;net48;net462</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <PackageId>TcknVkn</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>TCKNVKN</Authors>
+    <Company>TCKNVKN</Company>
+    <Product>TcknVkn</Product>
+    <Description>.NET için TCKN (TC Kimlik Numarası) ve VKN (Vergi Kimlik Numarası) doğrulama kütüphanesi. Tekli ve toplu doğrulama API'leri sunar.</Description>
+    <PackageTags>tckn vkn tc-kimlik vergi-kimlik turkish-id validation dotnet csharp</PackageTags>
+    <PackageProjectUrl>https://www.tcknvkn.com/kutuphaneler/csharp</PackageProjectUrl>
+    <PackageIcon>assets/icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/tcknvkn/tcknvkn-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>TCKN ve VKN doğrulama API'leri iyileştirildi; Türkçe dokümantasyon, test kapsamı ve CI/CD akışı güncellendi.</PackageReleaseNotes>
+    <Copyright>Copyright (c) 2026 TCKNVKN</Copyright>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Optimize>true</Optimize>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\" />
+    <None Include="../assets/icon.png" Pack="true" PackagePath="assets/icon.png" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

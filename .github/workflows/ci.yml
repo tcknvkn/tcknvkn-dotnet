@@ -1,0 +1,164 @@
+﻿name: CI
+
+on:
+  push:
+    branches:
+      - release
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - release
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            9.0.x
+            8.0.x
+
+      - name: Restore
+        run: dotnet restore ./TcknVkn.sln
+
+      - name: Build
+        run: dotnet build ./TcknVkn.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test ./tests/TcknVkn.Tests/TcknVkn.Tests.csproj -c Release --no-build --verbosity normal
+
+      - name: Pack
+        run: dotnet pack ./TcknVkn/TcknVkn.csproj -c Release --no-build -o ./artifacts
+
+  verify-tag-on-release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag commit is on release branch
+        run: |
+          git fetch origin release --depth=1
+          if git merge-base --is-ancestor "$GITHUB_SHA" "origin/release"; then
+            echo "Tag commit is on release branch."
+          else
+            echo "Tag must be created from release branch commit."
+            exit 1
+          fi
+
+  publish-beta:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha'))
+    needs:
+      - test-and-build
+      - verify-tag-on-release
+    runs-on: ubuntu-latest
+    environment: nuget-beta
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            9.0.x
+            8.0.x
+
+      - name: Restore
+        run: dotnet restore ./TcknVkn.sln
+
+      - name: Build
+        run: dotnet build ./TcknVkn.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test ./tests/TcknVkn.Tests/TcknVkn.Tests.csproj -c Release --no-build --verbosity normal
+
+      - name: Pack prerelease
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          dotnet pack ./TcknVkn/TcknVkn.csproj -c Release --no-build -o ./artifacts /p:PackageVersion=$VERSION
+
+      - name: Publish to NuGet (beta)
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
+  publish-stable:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-alpha')
+    needs:
+      - test-and-build
+      - verify-tag-on-release
+    runs-on: ubuntu-latest
+    environment: nuget-production
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            9.0.x
+            8.0.x
+
+      - name: Restore
+        run: dotnet restore ./TcknVkn.sln
+
+      - name: Build
+        run: dotnet build ./TcknVkn.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test ./tests/TcknVkn.Tests/TcknVkn.Tests.csproj -c Release --no-build --verbosity normal
+
+      - name: Pack stable
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          dotnet pack ./TcknVkn/TcknVkn.csproj -c Release --no-build -o ./artifacts /p:PackageVersion=$VERSION
+
+      - name: Publish to NuGet (stable)
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
+  release-beta:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha'))
+    needs:
+      - publish-beta
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub release (beta)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          prerelease: true
+          generate_release_notes: true
+
+  release-stable:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-alpha')
+    needs:
+      - publish-stable
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          prerelease: false
+          generate_release_notes: true
