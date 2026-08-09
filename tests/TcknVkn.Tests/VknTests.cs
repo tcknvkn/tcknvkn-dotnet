@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using TcknVkn;
 
 namespace TcknVkn.Tests;

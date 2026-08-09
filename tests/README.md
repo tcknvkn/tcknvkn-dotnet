@@ -1,4 +1,4 @@
-﻿# Tests
+# Tests
 
 Bu dizin `TcknVkn` için xUnit test projesini içerir.
 

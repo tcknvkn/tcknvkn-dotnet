@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD || NETFRAMEWORK
+#if NETSTANDARD || NETFRAMEWORK
 namespace System.Runtime.CompilerServices
 {
     //------------------------------------------------------------------------------

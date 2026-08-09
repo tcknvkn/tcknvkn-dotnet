@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0;net9.0;net8.0;netstandard2.1;netstandard2.0;net48;net462</TargetFrameworks>
     <Nullable>enable</Nullable>
@@ -6,7 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PackageId>TcknVkn</PackageId>
-    <Version>1.0.0</Version>
+    <!-- Yayin surumu CI tarafindan etiketten override edilir
+         (/p:PackageVersion=$VERSION). Buradaki deger yalnizca yerel
+         derleme ve test-and-build isindeki paketi etkiler. -->
+    <Version>1.0.8</Version>
     <Authors>TCKNVKN</Authors>
     <Company>TCKNVKN</Company>
     <Product>TcknVkn</Product>

@@ -1,4 +1,4 @@
-﻿namespace TcknVkn;
+namespace TcknVkn;
 
 //------------------------------------------------------------------------------
 // Proje: TcknVkn

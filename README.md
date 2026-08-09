@@ -1,4 +1,4 @@
-﻿# TcknVkn
+# TcknVkn
 
 `TcknVkn`, .NET projelerinde **TC Kimlik Numarası (TCKN)** ve **Vergi Kimlik Numarası (VKN)** doğrulaması için geliştirilen hafif bir NuGet kütüphanesidir.
 
